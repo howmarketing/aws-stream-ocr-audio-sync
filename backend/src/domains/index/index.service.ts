@@ -114,6 +114,47 @@ export class IndexService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * Get all segments sorted by start time
+   */
+  getAllSegments(): Segment[] {
+    if (!this.db) {
+      return [];
+    }
+
+    try {
+      const stmt = this.db.prepare(`
+        SELECT * FROM segments
+        ORDER BY start ASC
+      `);
+      return stmt.all() as Segment[];
+    } catch (error) {
+      console.error('Error fetching all segments:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get segments within a time range
+   */
+  getSegmentsByTimeRange(startTime: number, endTime: number): Segment[] {
+    if (!this.db) {
+      return [];
+    }
+
+    try {
+      const stmt = this.db.prepare(`
+        SELECT * FROM segments
+        WHERE (start <= ? AND end >= ?) OR (start >= ? AND start <= ?)
+        ORDER BY start ASC
+      `);
+      return stmt.all(endTime, startTime, startTime, endTime) as Segment[];
+    } catch (error) {
+      console.error('Error fetching segments by time range:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get database statistics
    */
   getStats() {

@@ -46,6 +46,7 @@ async function bootstrap() {
   console.log(`🎵 HLS: http://localhost:${port}/api/hls/playlist`);
   console.log(`📊 Index: http://localhost:${port}/api/index/segments`);
   console.log(`🔍 OCR: http://localhost:${port}/api/ocr/upload`);
+  console.log(`🔄 Sync: http://localhost:${port}/api/sync`);
   console.log('========================================\n');
 }
 

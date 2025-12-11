@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { HlsModule } from './domains/hls/hls.module';
 import { IndexModule } from './domains/index/index.module';
 import { OcrModule } from './domains/ocr/ocr.module';
+import { SyncModule } from './domains/sync/sync.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -14,6 +15,7 @@ import { HealthController } from './health.controller';
     HlsModule,
     IndexModule,
     OcrModule,
+    SyncModule,
   ],
   controllers: [HealthController],
 })
