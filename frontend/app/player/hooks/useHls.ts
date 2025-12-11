@@ -27,11 +27,19 @@ export function useHls(
         backBufferLength: 10,
         maxBufferLength: 10,
         maxMaxBufferLength: 15,
-        liveSyncDurationCount: 3,
-        liveMaxLatencyDurationCount: 5,
+        liveSyncDurationCount: 2,
+        liveMaxLatencyDurationCount: 4,
         enableWorker: true,
         startLevel: -1,
         debug: false,
+        // Force start from live edge
+        startPosition: -1,
+        // Handle segment gaps gracefully
+        maxFragLookUpTolerance: 0.1,
+        // Retry configuration for missing segments
+        fragLoadingMaxRetry: 2,
+        manifestLoadingMaxRetry: 3,
+        levelLoadingMaxRetry: 2,
       });
 
       hls.loadSource(options.playlistUrl);
@@ -39,6 +47,8 @@ export function useHls(
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log('✓ HLS manifest parsed');
+        // Start from the live edge
+        hls.startLoad(-1);
         if (options.autoPlay) {
           audio.play().catch((error) => {
             console.warn('Autoplay failed:', error);
@@ -47,19 +57,25 @@ export function useHls(
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
+        // Handle non-fatal fragment load errors (404s for old segments)
+        if (data.details === 'fragLoadError' && !data.fatal) {
+          console.warn('Segment load failed (likely aged out), skipping...');
+          return;
+        }
+
         console.error('HLS error:', data);
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              console.log('Network error, trying to recover...');
-              hls.startLoad();
+              console.log('Fatal network error, trying to recover...');
+              hls.startLoad(-1); // Restart from live edge
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              console.log('Media error, trying to recover...');
+              console.log('Fatal media error, trying to recover...');
               hls.recoverMediaError();
               break;
             default:
-              console.error('Fatal error, destroying HLS...');
+              console.error('Unrecoverable error, destroying HLS...');
               hls.destroy();
               break;
           }
