@@ -28,7 +28,7 @@ export function useHls(
         maxBufferLength: 120,
         maxMaxBufferLength: 180,
         // Allow seeking far from live edge (300 segments * 2s = 600s = 10 min)
-        liveSyncDurationCount: 300,
+        liveSyncDurationCount: 150,
         liveMaxLatencyDurationCount: 300,
         enableWorker: true,
         startLevel: -1,
