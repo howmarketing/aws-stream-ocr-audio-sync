@@ -74,7 +74,7 @@ export class OcrService {
   /**
    * Validate uploaded file
    */
-  validateImage(file: Express.Multer.File): void {
+  validateImage(file: any): void {
     // Check file size (max 10MB)
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
