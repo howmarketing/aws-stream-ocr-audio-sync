@@ -1,0 +1,41 @@
+{
+  "name": "audio-sync-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Low-Latency Audio Streaming Platform with Scoreboard Synchronization",
+  "keywords": [
+    "audio",
+    "streaming",
+    "hls",
+    "low-latency",
+    "ocr",
+    "sync"
+  ],
+  "author": "Gabriel Ariza",
+  "license": "MIT",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "streaming/indexer"
+  ],
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "build": "pnpm run --recursive build",
+    "test": "pnpm run --recursive test",
+    "lint": "pnpm run --recursive lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:build": "docker compose build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

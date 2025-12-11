@@ -1,0 +1,102 @@
+version: '3.9'
+
+services:
+  # FFmpeg Worker - Ingests external audio stream and generates HLS segments
+  ffmpeg-worker:
+    build:
+      context: ./streaming/ffmpeg-worker
+      dockerfile: Dockerfile
+    container_name: audio-sync-ffmpeg
+    environment:
+      # External stream URL - can be overridden via .env
+      - STREAM_URL=${STREAM_URL:-http://stream.live.vc.bbcmedia.co.uk/bbc_world_service}
+      - HLS_TIME=2
+      - HLS_LIST_SIZE=10
+    volumes:
+      - ./storage/hls:/storage/hls
+    restart: unless-stopped
+    networks:
+      - audio-sync-network
+    healthcheck:
+      test: ["CMD-SHELL", "ls /storage/hls/*.m3u8 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Indexer Worker - Monitors HLS segments and builds timestamp index
+  indexer:
+    build:
+      context: ./streaming/indexer
+      dockerfile: Dockerfile
+    container_name: audio-sync-indexer
+    environment:
+      - HLS_PATH=/storage/hls
+      - INDEX_DB_PATH=/storage/index/segments.db
+      - SEGMENT_DURATION=2
+    volumes:
+      - ./storage/hls:/storage/hls:ro
+      - ./storage/index:/storage/index
+    depends_on:
+      ffmpeg-worker:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - audio-sync-network
+
+  # Backend API - NestJS server for HLS serving, OCR, and sync
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: audio-sync-backend
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - STORAGE_PATH=/storage
+      - INDEX_DB_PATH=/storage/index/segments.db
+      - CORS_ORIGIN=http://localhost:3000
+    volumes:
+      - ./storage:/storage:ro
+    depends_on:
+      - indexer
+    restart: unless-stopped
+    networks:
+      - audio-sync-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend - Next.js 16 player application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: audio-sync-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - audio-sync-network
+
+# Named volumes for persistent storage
+volumes:
+  hls-storage:
+    driver: local
+  index-storage:
+    driver: local
+
+# Custom network for service communication
+networks:
+  audio-sync-network:
+    name: audio-sync-network
+    driver: bridge

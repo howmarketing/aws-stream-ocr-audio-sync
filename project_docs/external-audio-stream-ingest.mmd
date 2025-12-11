@@ -1,0 +1,13 @@
+flowchart LR
+    EXT["External Audio Stream<br/>URL"] --> INGEST["FFmpeg Ingest Worker"]
+    INGEST --> TRANSCODE["FFmpeg Transcoder"]
+    TRANSCODE --> PACKAGE["HLS Packager<br/>LL-HLS Mode"]
+    PACKAGE --> SEGMENTS["HLS Segments<br/>(.ts / .m4s)"]
+    PACKAGE --> PLAYLIST["index.m3u8"]
+    SEGMENTS --> INDEXER["Indexer Worker"]
+    INDEXER --> META["Index Metadata DB (JSON or SQLite)"]
+    PLAYLIST --> SERVER["Local HTTP Server"]
+    SEGMENTS --> SERVER
+    SERVER --> FRONTEND["Next.js Player"]
+    META --> SYNC["Sync Engine"]
+    SYNC --> FRONTEND
