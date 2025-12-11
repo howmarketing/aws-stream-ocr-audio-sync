@@ -1,6 +1,8 @@
-import { Controller, Get, Param, Res, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Res, HttpStatus, NotFoundException, StreamableFile } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { HlsService } from './hls.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller('hls')
 export class HlsController {
@@ -14,6 +16,13 @@ export class HlsController {
   async getPlaylist(@Res() reply: FastifyReply) {
     try {
       const playlistPath = this.hlsService.getPlaylistPath();
+      const filePath = path.join(playlistPath, 'index.m3u8');
+
+      if (!fs.existsSync(filePath)) {
+        throw new NotFoundException('Playlist not found');
+      }
+
+      const stream = fs.createReadStream(filePath);
 
       return reply
         .code(HttpStatus.OK)
@@ -21,7 +30,7 @@ export class HlsController {
         .header('Cache-Control', 'no-cache, no-store, must-revalidate')
         .header('Pragma', 'no-cache')
         .header('Expires', '0')
-        .sendFile('index.m3u8', playlistPath);
+        .send(stream);
     } catch (error) {
       throw new NotFoundException('Playlist not found');
     }
@@ -43,13 +52,20 @@ export class HlsController {
 
     try {
       const segmentPath = this.hlsService.getSegmentPath(filename);
+      const filePath = path.join(segmentPath, filename);
+
+      if (!fs.existsSync(filePath)) {
+        throw new NotFoundException(`Segment ${filename} not found`);
+      }
+
+      const stream = fs.createReadStream(filePath);
 
       return reply
         .code(HttpStatus.OK)
         .header('Content-Type', 'video/mp2t')
         .header('Cache-Control', 'public, max-age=2')
         .header('Access-Control-Allow-Origin', '*')
-        .sendFile(filename, segmentPath);
+        .send(stream);
     } catch (error) {
       throw new NotFoundException(`Segment ${filename} not found`);
     }

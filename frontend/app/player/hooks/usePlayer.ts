@@ -12,7 +12,7 @@ interface UsePlayerReturn {
 }
 
 export function usePlayer(
-  audioRef: RefObject<HTMLAudioElement>
+  audioRef: RefObject<HTMLAudioElement | null>
 ): UsePlayerReturn {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

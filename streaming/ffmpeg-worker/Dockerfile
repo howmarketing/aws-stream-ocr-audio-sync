@@ -2,10 +2,11 @@
 FROM linuxserver/ffmpeg:latest
 
 # Install additional utilities
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     bash \
     curl \
-    coreutils
+    coreutils \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create working directory
 WORKDIR /app

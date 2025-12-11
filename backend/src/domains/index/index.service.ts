@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import Database from 'better-sqlite3';
 import * as path from 'path';
 
-interface Segment {
+export interface Segment {
   id: number;
   sequence: number;
   filename: string;

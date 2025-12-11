@@ -9,7 +9,7 @@ interface UseHlsOptions {
 }
 
 export function useHls(
-  audioRef: RefObject<HTMLAudioElement>,
+  audioRef: RefObject<HTMLAudioElement | null>,
   options: UseHlsOptions
 ) {
   const hlsRef = useRef<Hls | null>(null);

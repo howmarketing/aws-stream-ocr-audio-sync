@@ -12,13 +12,16 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json ./
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
+
+# Rebuild better-sqlite3 for the container's architecture
+RUN cd node_modules/better-sqlite3 && npm run build-release
 
 # Copy source code
 COPY . .
