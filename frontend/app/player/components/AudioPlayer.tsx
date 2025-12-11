@@ -10,7 +10,7 @@ interface AudioPlayerProps {
 }
 
 export function AudioPlayer({ playlistUrl, audioRef: externalAudioRef }: AudioPlayerProps) {
-  const internalAudioRef = useRef<HTMLAudioElement>(null);
+  const internalAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioRef = externalAudioRef || internalAudioRef;
 
   // Initialize HLS
