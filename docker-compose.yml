@@ -46,6 +46,29 @@ services:
     networks:
       - audio-sync-network
 
+  # OCR Worker - Tesseract-based scoreboard detection
+  ocr:
+    build:
+      context: ./streaming/ocr
+      dockerfile: Dockerfile
+    container_name: audio-sync-ocr
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - OCR_INPUT_PATH=/ocr/input
+      - OCR_OUTPUT_PATH=/ocr/output
+    volumes:
+      - ./storage/ocr/input:/ocr/input
+      - ./storage/ocr/output:/ocr/output
+    restart: unless-stopped
+    networks:
+      - audio-sync-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # Backend API - NestJS server for HLS serving, OCR, and sync
   backend:
     build:
@@ -60,10 +83,13 @@ services:
       - STORAGE_PATH=/storage
       - INDEX_DB_PATH=/storage/index/segments.db
       - CORS_ORIGIN=http://localhost:3030
+      - OCR_SERVICE_URL=http://ocr:3001
     volumes:
       - ./storage:/storage:ro
+      - ./storage/ocr:/ocr
     depends_on:
       - indexer
+      - ocr
     restart: unless-stopped
     networks:
       - audio-sync-network
