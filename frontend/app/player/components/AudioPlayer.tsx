@@ -39,23 +39,24 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
           const hls = hlsRef.current;
           const audio = audioRef.current;
 
-          // Stop loading
-          hls.stopLoad();
+          // Pause playback first
+          const wasPlaying = !audio.paused;
+          audio.pause();
 
-          // Detach media to reset buffering completely
-          hls.detachMedia();
-
-          // Set the position while detached
+          // Seek to the position
           audio.currentTime = time;
 
-          // Reattach media
-          hls.attachMedia(audio);
+          // Force HLS to reload from this position by triggering a level switch
+          const currentLevel = hls.currentLevel;
+          hls.currentLevel = -1; // Auto
+          hls.currentLevel = currentLevel;
 
-          // Start loading from the new position
-          // Using setTimeout to ensure attachment is complete
-          setTimeout(() => {
-            hls.startLoad(time);
-          }, 100);
+          // Resume playback if it was playing
+          if (wasPlaying) {
+            setTimeout(() => {
+              audio.play().catch(console.error);
+            }, 200);
+          }
         } else {
           // Fallback for native HLS support (Safari)
           seek(time);
