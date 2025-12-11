@@ -2,12 +2,28 @@
  * Sync Domain - Data Transfer Objects
  */
 
+import { IsString, IsOptional, IsNumber, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class ScoreDto {
+  @IsNumber()
+  home: number;
+
+  @IsNumber()
+  away: number;
+}
+
 export class SyncRequestDto {
+  @IsString()
   clock: string; // Format: MM:SS or M:SS
-  score?: {
-    home: number;
-    away: number;
-  };
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ScoreDto)
+  score?: ScoreDto;
+
+  @IsOptional()
+  @IsNumber()
   ocrConfidence?: number; // Optional OCR confidence from previous step
 }
 
