@@ -1,15 +1,17 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, RefObject } from 'react';
 import { useHls } from '../hooks/useHls';
 import { usePlayer } from '../hooks/usePlayer';
 
 interface AudioPlayerProps {
   playlistUrl: string;
+  audioRef?: RefObject<HTMLAudioElement | null>;
 }
 
-export function AudioPlayer({ playlistUrl }: AudioPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
+export function AudioPlayer({ playlistUrl, audioRef: externalAudioRef }: AudioPlayerProps) {
+  const internalAudioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = externalAudioRef || internalAudioRef;
 
   // Initialize HLS
   useHls(audioRef, {
