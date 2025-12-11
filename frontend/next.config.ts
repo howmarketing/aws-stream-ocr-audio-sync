@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  output: 'standalone',
 
   // Environment variables exposed to the browser
   env: {
