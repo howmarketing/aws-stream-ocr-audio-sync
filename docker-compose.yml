@@ -8,12 +8,15 @@ services:
       dockerfile: Dockerfile
     container_name: audio-sync-ffmpeg
     environment:
-      # External stream URL - can be overridden via .env
-      - STREAM_URL=${STREAM_URL:-http://stream.live.vc.bbcmedia.co.uk/bbc_world_service}
+      # Audio source - local file or external stream
+      - STREAM_URL=${STREAM_URL:-/audio/recording.mp3}
       - HLS_TIME=2
       - HLS_LIST_SIZE=10
+      - ENABLE_LOOP=true  # Loop local file for continuous playback
     volumes:
       - ./storage/hls:/storage/hls
+      # Mount local MP3 file
+      - /Users/gabrielariza/Documents/bd-tasks/recording-task/2025-12-09_15-51-15.mp3:/audio/recording.mp3:ro
     restart: unless-stopped
     networks:
       - audio-sync-network

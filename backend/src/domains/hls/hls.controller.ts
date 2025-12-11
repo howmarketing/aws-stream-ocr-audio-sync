@@ -37,10 +37,11 @@ export class HlsController {
   }
 
   /**
-   * GET /api/hls/segments/:filename
+   * GET /api/hls/:filename
    * Returns an HLS segment file
+   * Note: Route changed from /segments/:filename to /:filename to match HLS.js relative URL resolution
    */
-  @Get('segments/:filename')
+  @Get(':filename')
   async getSegment(
     @Param('filename') filename: string,
     @Res() reply: FastifyReply,

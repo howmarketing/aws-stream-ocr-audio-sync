@@ -20,8 +20,18 @@ rm -f "${HLS_PATH}"/*.m3u8
 
 echo "Starting FFmpeg ingestion..."
 
+# Determine if we should loop (for local files)
+LOOP_FLAG=""
+if [ "${ENABLE_LOOP}" = "true" ]; then
+    echo "Loop mode enabled (for local file playback)"
+    LOOP_FLAG="-stream_loop -1"
+fi
+
 # FFmpeg command for low-latency HLS generation
+# -re flag: read input at native frame rate (real-time, not as fast as possible)
 ffmpeg \
+    -re \
+    ${LOOP_FLAG} \
     -i "${STREAM_URL}" \
     -c:a aac \
     -b:a 128k \
