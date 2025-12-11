@@ -5,6 +5,8 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { IndexService } from '../index/index.service';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 
 export interface SegmentMatch {
   filename: string;
@@ -21,8 +23,22 @@ export interface SegmentMatch {
 export class TimestampSearcherService {
   private readonly logger = new Logger(TimestampSearcherService.name);
   private readonly DRIFT_TOLERANCE = 5; // seconds
+  private readonly HLS_STORAGE_PATH = process.env.HLS_STORAGE_PATH || '/storage/hls';
 
   constructor(private readonly indexService: IndexService) {}
+
+  /**
+   * Check if a segment file exists on disk
+   */
+  private async segmentExists(filename: string): Promise<boolean> {
+    try {
+      const filePath = join(this.HLS_STORAGE_PATH, filename);
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   /**
    * Search for segment containing the target timestamp
@@ -33,14 +49,34 @@ export class TimestampSearcherService {
       const startTime = Date.now();
 
       // Get all segments sorted by start time
-      const segments = await this.indexService.getAllSegments();
+      const allSegments = await this.indexService.getAllSegments();
 
-      if (!segments || segments.length === 0) {
+      if (!allSegments || allSegments.length === 0) {
         this.logger.warn('No segments available for search');
         return null;
       }
 
-      this.logger.log(`Searching ${segments.length} segments for timestamp: ${targetSeconds}s`);
+      // Filter to only segments that exist on disk
+      const existenceChecks = await Promise.all(
+        allSegments.map(async (seg) => ({
+          segment: seg,
+          exists: await this.segmentExists(seg.filename),
+        }))
+      );
+
+      const segments = existenceChecks
+        .filter(check => check.exists)
+        .map(check => check.segment);
+
+      if (segments.length === 0) {
+        this.logger.warn('No segments exist on disk (all segments may have aged out)');
+        return null;
+      }
+
+      this.logger.log(
+        `Searching ${segments.length}/${allSegments.length} available segments ` +
+        `for timestamp: ${targetSeconds}s`
+      );
 
       // Binary search for segment containing target time
       let left = 0;
