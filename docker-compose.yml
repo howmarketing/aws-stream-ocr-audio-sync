@@ -11,7 +11,7 @@ services:
       # Audio source - local file or external stream
       - STREAM_URL=${STREAM_URL:-/audio/recording.mp3}
       - HLS_TIME=2
-      - HLS_LIST_SIZE=10
+      - HLS_LIST_SIZE=300  # Keep 300 segments (10 minutes) for sync feature
       - ENABLE_LOOP=true  # Loop local file for continuous playback
     volumes:
       - ./storage/hls:/storage/hls
