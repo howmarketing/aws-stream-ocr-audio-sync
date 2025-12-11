@@ -22,7 +22,7 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
     const audioRef = externalAudioRef || internalAudioRef;
 
     // Initialize HLS
-    useHls(audioRef, {
+    const hlsRef = useHls(audioRef, {
       playlistUrl,
       autoPlay: false,
     });
@@ -33,7 +33,19 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
       seekTo: (time: number) => {
-        seek(time);
+        // For HLS.js, we need to tell it to load from the new position
+        if (hlsRef.current && audioRef.current) {
+          console.log(`Seeking to ${time}s with HLS.js`);
+          // Stop current loading
+          hlsRef.current.stopLoad();
+          // Set the position
+          audioRef.current.currentTime = time;
+          // Restart loading from the new position
+          hlsRef.current.startLoad(time);
+        } else {
+          // Fallback for native HLS support (Safari)
+          seek(time);
+        }
       },
       play: () => {
         if (audioRef.current && !isPlaying) {
