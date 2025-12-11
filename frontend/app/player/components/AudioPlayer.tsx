@@ -36,12 +36,26 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
         // For HLS.js, we need to tell it to load from the new position
         if (hlsRef.current && audioRef.current) {
           console.log(`Seeking to ${time}s with HLS.js`);
-          // Stop current loading
-          hlsRef.current.stopLoad();
-          // Set the position
-          audioRef.current.currentTime = time;
-          // Restart loading from the new position
-          hlsRef.current.startLoad(time);
+          const hls = hlsRef.current;
+          const audio = audioRef.current;
+
+          // Stop loading
+          hls.stopLoad();
+
+          // Detach media to reset buffering completely
+          hls.detachMedia();
+
+          // Set the position while detached
+          audio.currentTime = time;
+
+          // Reattach media
+          hls.attachMedia(audio);
+
+          // Start loading from the new position
+          // Using setTimeout to ensure attachment is complete
+          setTimeout(() => {
+            hls.startLoad(time);
+          }, 100);
         } else {
           // Fallback for native HLS support (Safari)
           seek(time);
