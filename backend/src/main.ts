@@ -9,6 +9,13 @@ async function bootstrap() {
     new FastifyAdapter({ logger: true }),
   );
 
+  // Register multipart plugin for file uploads
+  await app.register(require('@fastify/multipart'), {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB
+    },
+  });
+
   // Global prefix
   app.setGlobalPrefix('api');
 
@@ -38,6 +45,7 @@ async function bootstrap() {
   console.log(`🏥 Health: http://localhost:${port}/api/health`);
   console.log(`🎵 HLS: http://localhost:${port}/api/hls/playlist`);
   console.log(`📊 Index: http://localhost:${port}/api/index/segments`);
+  console.log(`🔍 OCR: http://localhost:${port}/api/ocr/upload`);
   console.log('========================================\n');
 }
 
