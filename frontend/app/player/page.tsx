@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { AudioPlayer } from './components/AudioPlayer';
+import { AudioPlayer, AudioPlayerHandle } from './components/AudioPlayer';
 import { SyncModal } from './components/SyncModal';
 import Link from 'next/link';
 
@@ -10,13 +10,14 @@ export default function PlayerPage() {
   const playlistUrl = `${API_URL}/api/hls/playlist`;
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const playerRef = useRef<AudioPlayerHandle>(null);
   const [syncModalOpen, setSyncModalOpen] = useState(false);
   const [syncedTimestamp, setSyncedTimestamp] = useState<number | null>(null);
 
   const handleSyncComplete = (timestamp: number) => {
     // Seek audio to the synced timestamp
-    if (audioRef.current) {
-      audioRef.current.currentTime = timestamp;
+    if (playerRef.current) {
+      playerRef.current.seekTo(timestamp);
     }
     setSyncedTimestamp(timestamp);
     setSyncModalOpen(false);
@@ -48,7 +49,7 @@ export default function PlayerPage() {
         </button>
       </div>
 
-      <AudioPlayer playlistUrl={playlistUrl} audioRef={audioRef} />
+      <AudioPlayer ref={playerRef} playlistUrl={playlistUrl} audioRef={audioRef} />
 
       {syncedTimestamp !== null && (
         <div className="mt-6 bg-green-50 border-2 border-green-200 rounded-lg p-4 max-w-2xl w-full animate-fadeIn">

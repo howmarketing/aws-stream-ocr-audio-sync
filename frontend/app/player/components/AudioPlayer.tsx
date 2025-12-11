@@ -1,26 +1,51 @@
 'use client';
 
-import { useRef, RefObject } from 'react';
+import { useRef, RefObject, useImperativeHandle, forwardRef } from 'react';
 import { useHls } from '../hooks/useHls';
 import { usePlayer } from '../hooks/usePlayer';
 
 interface AudioPlayerProps {
   playlistUrl: string;
   audioRef?: RefObject<HTMLAudioElement | null>;
+  playerRef?: RefObject<AudioPlayerHandle>;
 }
 
-export function AudioPlayer({ playlistUrl, audioRef: externalAudioRef }: AudioPlayerProps) {
-  const internalAudioRef = useRef<HTMLAudioElement | null>(null);
-  const audioRef = externalAudioRef || internalAudioRef;
+export interface AudioPlayerHandle {
+  seekTo: (time: number) => void;
+  play: () => void;
+  pause: () => void;
+}
 
-  // Initialize HLS
-  useHls(audioRef, {
-    playlistUrl,
-    autoPlay: false,
-  });
+export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
+  ({ playlistUrl, audioRef: externalAudioRef }, ref) => {
+    const internalAudioRef = useRef<HTMLAudioElement | null>(null);
+    const audioRef = externalAudioRef || internalAudioRef;
 
-  // Player controls
-  const { isPlaying, currentTime, togglePlay, seekBy } = usePlayer(audioRef);
+    // Initialize HLS
+    useHls(audioRef, {
+      playlistUrl,
+      autoPlay: false,
+    });
+
+    // Player controls
+    const { isPlaying, currentTime, togglePlay, seekBy, seek } = usePlayer(audioRef);
+
+    // Expose methods to parent component
+    useImperativeHandle(ref, () => ({
+      seekTo: (time: number) => {
+        seek(time);
+      },
+      play: () => {
+        if (audioRef.current && !isPlaying) {
+          audioRef.current.play().catch(console.error);
+        }
+      },
+      pause: () => {
+        if (audioRef.current && isPlaying) {
+          audioRef.current.pause();
+        }
+      },
+    }));
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -131,4 +156,6 @@ export function AudioPlayer({ playlistUrl, audioRef: externalAudioRef }: AudioPl
       </div>
     </div>
   );
-}
+});
+
+AudioPlayer.displayName = 'AudioPlayer';
