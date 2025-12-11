@@ -22,13 +22,14 @@ export function useHls(
     // Check if HLS is supported
     if (Hls.isSupported()) {
       const hls = new Hls({
-        // Low-latency configuration
-        lowLatencyMode: true,
-        backBufferLength: 10,
-        maxBufferLength: 10,
-        maxMaxBufferLength: 15,
-        liveSyncDurationCount: 2,
-        liveMaxLatencyDurationCount: 4,
+        // Disable low-latency mode to allow seeking away from live edge
+        lowLatencyMode: false,
+        backBufferLength: 90,
+        maxBufferLength: 120,
+        maxMaxBufferLength: 180,
+        // Allow seeking far from live edge (300 segments * 2s = 600s = 10 min)
+        liveSyncDurationCount: 300,
+        liveMaxLatencyDurationCount: 300,
         enableWorker: true,
         startLevel: -1,
         debug: false,
