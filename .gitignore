@@ -1,6 +1,8 @@
 # local only
 .history/
 pnpm-lock.yaml
+pnpm-lock.sample.yaml
+
 
 # Dependencies
 node_modules/
