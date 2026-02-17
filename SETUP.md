@@ -7,35 +7,35 @@ The Audio Sync Platform is a low-latency audio streaming system with timestamp-b
 ## Architecture
 
 ```
-┌─────────────────┐
-│  BBC World      │
-│  Service Stream │
-└────────┬────────┘
+┌──────────┐
+│  BBC World        │
+│  Service Stream  │
+└───┬──────┘
          │
          v
-┌─────────────────┐      ┌──────────────┐
-│ FFmpeg Worker   │─────>│ HLS Storage  │
-│ (Stream Ingest) │      │ /storage/hls │
-└─────────────────┘      └──────┬───────┘
-                                │
-                                v
-                         ┌──────────────┐      ┌───────────────┐
-                         │   Indexer    │─────>│  SQLite Index │
-                         │   Worker     │      │ /storage/index│
-                         └──────────────┘      └───────────────┘
-                                                       │
-                         ┌─────────────────────────────┘
-                         v
-                  ┌──────────────┐
-                  │  NestJS API  │
-                  │  (Backend)   │
-                  └──────┬───────┘
-                         │
-                         v
-                  ┌──────────────┐
-                  │  Next.js 16  │
-                  │  (Frontend)  │
-                  └──────────────┘
+┌────────────┐                ┌──────────┐
+│ (FFmpeg Worker)    │  ────> │ HLS storage       │
+│ (STream Ingest)       │                │ /storage/hls         │
+└────────────┘                └──────┬───┘
+                                                                           │
+                                                                           v
+                         ┌───────┐         ┌─────────┐
+                         │ Indexer       │──> │  SQLite Index  │
+                         │ Worker       │         │ /storage/index  │
+                         └───────┘         └─────────┘
+                                         │
+                    ┌──────┘
+                    v
+          ┌────────┐
+          │  NestJS API  │
+          │  (Backend)    │
+          └────────┘
+                 │
+                 v
+          ┌────────┐
+          │  Next.js 16    │
+          │  (Frontend)   │
+          └────────┘
 ```
 
 ## Components

@@ -1,3 +1,7 @@
+# local only
+.history/
+pnpm-lock.yaml
+
 # Dependencies
 node_modules/
 .pnp
