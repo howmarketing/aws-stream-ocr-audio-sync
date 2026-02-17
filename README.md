@@ -1,5 +1,11 @@
 # 🎧 Audio Sync Platform
 
+### RUN IT QUICKLY AS POSSIBLE
+
+```bash
+docker compose up -d
+```
+
 **Low-Latency Audio Streaming with Scoreboard Synchronization**
 
 A local, cloud-free simulation of AWS MediaLive + MediaPackage for real-time audio streaming with OCR-based scoreboard synchronization.
