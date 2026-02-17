@@ -5,11 +5,12 @@
 ```bash
 docker compose up -d
 ```
-<video controls src="./aws-stream-ocr-audio-sync-demo.mp4" title="Title"></video>
+
 ![alt text](./image-2.png)
 ![alt text](./image-3.png)
 ![alt text](./image-4.png)
 ![alt text](./image-5.png)
+<video controls src="./aws-stream-ocr-audio-sync-demo.mp4" title="Title"></video>
 
 **Low-Latency Audio Streaming with Scoreboard Synchronization**
 
