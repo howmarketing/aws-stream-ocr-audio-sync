@@ -4,7 +4,7 @@
 
 ### 1. Start the System
 ```bash
-cd /Users/gabrielariza/Documents/bd-tasks/recording-task/project/applications
+cd /Users/m4/Documents/Gabs/bd-tasks/envs/applications/aws-stream-ocr-audio-sync
 docker compose up -d
 ```
 

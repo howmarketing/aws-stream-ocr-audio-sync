@@ -18,8 +18,7 @@ Perfect! Let me create one final summary for you:
   ✅ Tests Created & Passing
 
   Unit Tests (55 passing):
-  cd
-  /Users/gabrielariza/Documents/bd-tasks/recording-task/project/applications/backend
+  cd /Users/m4/Documents/Gabs/bd-tasks/envs/applications/aws-stream-ocr-audio-sync/backend
   npm test -- src/
   - Clock Normalizer: 15 tests ✅
   - Confidence Calculator: 15 tests ✅

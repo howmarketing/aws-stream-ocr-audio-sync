@@ -21,7 +21,7 @@ curl -X POST http://localhost:4000/api/ocr/upload \
 
 ### On any platform:
 1. Take a screenshot of a scoreboard showing game clock (MM:SS format)
-2. Save it to: `/Users/gabrielariza/Documents/bd-tasks/recording-task/project/applications/test-images/scoreboard.jpg`
+2. Save it to: `/Users/m4/Documents/Gabs/bd-tasks/envs/applications/aws-stream-ocr-audio-sync/test-images/scoreboard.jpg`
 
 ## Option 2: Download a Sample Image
 
@@ -50,7 +50,10 @@ draw = ImageDraw.Draw(img)
 
 # Use default font (or specify a path to a .ttf file)
 try:
-    font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Bold.ttf", 80)
+    try:
+        font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Bold.ttf", 80)
+    except:
+        font = ImageFont.truetype("/Users/m4/Documents/Gabs/bd-tasks/envs/applications/aws-stream-ocr-audio-sync/test-images/ArialBold.ttf", 80)
 except:
     font = ImageFont.load_default()
 
@@ -58,7 +61,7 @@ except:
 draw.text((300, 50), "12:34", fill='white', font=font)
 
 # Save
-output_path = "/Users/gabrielariza/Documents/bd-tasks/recording-task/project/applications/test-images/scoreboard.jpg"
+output_path = "/Users/m4/Documents/Gabs/bd-tasks/envs/applications/aws-stream-ocr-audio-sync/test-images/scoreboard.jpg"
 img.save(output_path)
 print(f"Test image created: {output_path}")
 EOF
