@@ -26,8 +26,11 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
     "docker:logs": "docker compose logs -f",
-    "docker:build": "docker compose build"
+    "docker:build:up": "docker compose up --build -d",
+    "docker:build:up:dev": "docker compose up --build -d --build-arg NODE_ENV=development", 
+    "docker:build:up:prod": "docker compose up --build -d --build-arg NODE_ENV=production"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

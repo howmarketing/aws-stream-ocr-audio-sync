@@ -24,15 +24,17 @@ export function useHls(
       const hls = new Hls({
         // Disable low-latency mode to allow seeking away from live edge
         lowLatencyMode: false,
-        backBufferLength: 90,
-        maxBufferLength: 120,
-        maxMaxBufferLength: 180,
+        backBufferLength: 270, // backBufferLength: 90,
+        maxBufferLength: 540, // maxBufferLength: 120,
+        maxMaxBufferLength: 810, // maxMaxBufferLength: 180,
+
         // Allow seeking far from live edge (300 segments * 2s = 600s = 10 min)
-        liveSyncDurationCount: 150,
-        liveMaxLatencyDurationCount: 300,
+        liveSyncDurationCount: 675, // liveSyncDurationCount: 150,
+        liveMaxLatencyDurationCount: 1350, // liveMaxLatencyDurationCount: 300,
         enableWorker: true,
         startLevel: -1,
         debug: false,
+        
         // Force start from live edge
         startPosition: -1,
         // Handle segment gaps gracefully
